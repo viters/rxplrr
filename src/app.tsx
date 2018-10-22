@@ -20,7 +20,8 @@ const FlexRow = styled.div`
 `;
 
 const Editor = styled.div`
+  box-shadow: 5px 0px 21px -9px rgba(0,0,0,0.75);
   background-color: ${Colors.darkBlue};
   height: 100%;
-  width: 700px;
+  flex-basis: 600px;
 `;

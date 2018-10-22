@@ -4,7 +4,7 @@ import { lift, pick, pipe, range } from 'ramda';
 import * as React from 'react';
 import { Circle, Layer, Rect, Stage } from 'react-konva';
 import { fromEvent, Subject } from 'rxjs';
-import { mapTo, startWith, takeUntil } from 'rxjs/operators';
+import { mapTo, startWith, takeUntil, tap } from 'rxjs/operators';
 import styled from 'styled-components';
 import { Colors } from '../../constants/colors';
 
@@ -14,12 +14,14 @@ interface State {
   offset: Vector2d;
 }
 
+const initialState: State = {
+  height: 0,
+  offset: { x: 0, y: 0 },
+  width: 0
+};
+
 export class Visualizer extends React.Component<any, State> {
-  public state = {
-    height: 0,
-    offset: { x: 0, y: 0 },
-    width: 0
-  };
+  public state = initialState;
 
   private unsubscribe$ = new Subject<void>();
   private containerRef = React.createRef<any>();
@@ -29,6 +31,7 @@ export class Visualizer extends React.Component<any, State> {
       .pipe(
         startWith(null),
         takeUntil(this.unsubscribe$),
+        tap(() => this.setState(initialState)),
         mapTo(fromNullable(this.containerRef.current))
       )
       .subscribe(
@@ -67,5 +70,5 @@ export class Visualizer extends React.Component<any, State> {
 
 const Container = styled.div`
   height: 100%;
-  width: 100%;
+  flex-grow: 1;
 `;
