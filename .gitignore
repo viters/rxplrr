@@ -18,6 +18,8 @@
 
 # ide
 *.code-workspace
+rxplrr.iml
+.idea/
 
 npm-debug.log*
 yarn-debug.log*

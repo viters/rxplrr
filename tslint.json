@@ -1,5 +1,14 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "extends": [
+    "tslint:recommended",
+    "tslint-react",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "no-console": false,
+    "quotemark": [true, "single", "jsx-double"],
+    "file-name-casing": [true, "kebab-case"]
+  },
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
