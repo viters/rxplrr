@@ -1,14 +1,23 @@
 import { fromNullable, Option } from 'fp-ts/lib/Option';
-import { lift, pick, pipe } from 'ramda';
+import { Vector2d } from 'konva';
+import { lift, pick, pipe, range } from 'ramda';
 import * as React from 'react';
-import { Layer, Rect, Stage } from 'react-konva';
+import { Circle, Layer, Rect, Stage } from 'react-konva';
 import { fromEvent, Subject } from 'rxjs';
 import { mapTo, startWith, takeUntil } from 'rxjs/operators';
 import styled from 'styled-components';
+import { Colors } from '../../constants/colors';
 
-export class Visualizer extends React.Component {
+interface State {
+  height: number;
+  width: number;
+  offset: Vector2d;
+}
+
+export class Visualizer extends React.Component<any, State> {
   public state = {
     height: 0,
+    offset: { x: 0, y: 0 },
     width: 0
   };
 
@@ -26,8 +35,13 @@ export class Visualizer extends React.Component {
         pipe(
           lift((x: HTMLElement) => x.getBoundingClientRect()),
           lift(pick(['height', 'width'])),
-          (x: Option<{ height: number; width: number }>) =>
-            x.fold(null, this.setState.bind(this))
+          (o: Option<{ height: number; width: number }>) =>
+            o.fold(null, x =>
+              this.setState({
+                ...x,
+                offset: { x: -(x.width / 2), y: -(x.height / 2) }
+              })
+            )
         )
       );
   }
@@ -42,14 +56,8 @@ export class Visualizer extends React.Component {
       <Container ref={this.containerRef}>
         <Stage {...this.state}>
           <Layer>
-            <Rect
-              x={20}
-              y={50}
-              width={100}
-              height={100}
-              fill="red"
-              shadowBlur={10}
-            />
+            {range(0, 10).map((x, i) => i === 0 ? <Circle x={-400} y={0} radius={13} fill={Colors.darkBlue} key={i}/> :
+            <Rect x={-400 + i * 80} y={0} width={40} height={26} cornerRadius={10} offsetY={13} fill={Colors.darkBlue}  key={i}/>)}
           </Layer>
         </Stage>
       </Container>

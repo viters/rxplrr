@@ -22,5 +22,5 @@ const FlexRow = styled.div`
 const Editor = styled.div`
   background-color: ${Colors.darkBlue};
   height: 100%;
-  width: 400px;
+  width: 700px;
 `;
