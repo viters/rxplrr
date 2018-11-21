@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/recompose": "^0.30.0",
     "fp-ts": "^1.9.0",
     "konva": "^2.4.2",
     "ramda": "^0.25.0",
@@ -10,6 +11,7 @@
     "react-dom": "^16.5.2",
     "react-konva": "^16.5.2",
     "react-scripts-ts": "3.1.0",
+    "recompose": "^0.30.0",
     "rxjs": "^6.3.3",
     "styled-components": "^4.0.2"
   },

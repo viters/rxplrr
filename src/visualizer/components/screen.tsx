@@ -1,12 +1,12 @@
 import { fromNullable, Option } from 'fp-ts/lib/Option';
 import { Vector2d } from 'konva';
-import { lift, pick, pipe, range } from 'ramda';
+import { lift, pick, pipe } from 'ramda';
 import * as React from 'react';
-import { Circle, Layer, Rect, Stage } from 'react-konva';
+import { Layer, Stage } from 'react-konva';
 import { fromEvent, Subject } from 'rxjs';
 import { mapTo, startWith, takeUntil, tap } from 'rxjs/operators';
 import styled from 'styled-components';
-import { Colors } from '../../constants/colors';
+import { StreamDisplay } from './stream-display';
 
 interface State {
   height: number;
@@ -20,7 +20,7 @@ const initialState: State = {
   width: 0
 };
 
-export class Visualizer extends React.Component<any, State> {
+export class Screen extends React.Component<any, State> {
   public state = initialState;
 
   private unsubscribe$ = new Subject<void>();
@@ -42,7 +42,7 @@ export class Visualizer extends React.Component<any, State> {
             o.fold(null, x =>
               this.setState({
                 ...x,
-                offset: { x: -(x.width / 2), y: -(x.height / 2) }
+                offset: { x: 0, y: 0 }
               })
             )
         )
@@ -59,8 +59,7 @@ export class Visualizer extends React.Component<any, State> {
       <Container ref={this.containerRef}>
         <Stage {...this.state}>
           <Layer>
-            {range(0, 10).map((x, i) => i === 0 ? <Circle x={-400} y={0} radius={13} fill={Colors.darkBlue} key={i}/> :
-            <Rect x={-400 + i * 80} y={0} width={40} height={26} cornerRadius={10} offsetY={13} fill={Colors.darkBlue}  key={i}/>)}
+            <StreamDisplay />
           </Layer>
         </Stage>
       </Container>
