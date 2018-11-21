@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { interval, Subject } from 'rxjs';
 import { scan, takeUntil } from 'rxjs/operators';
-import { Stream } from './stream';
+import { LimitedStream } from './limited-stream';
 
 export interface State {
   items: number[];
@@ -27,6 +27,8 @@ export class StreamDisplay extends React.Component<{}, State> {
   }
 
   public render() {
-    return <Stream title="interval" items={this.state.items} />;
+    return (
+      <LimitedStream title="interval" items={this.state.items} limit={6} />
+    );
   }
 }
