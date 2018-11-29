@@ -1,13 +1,12 @@
 import { takeLast } from 'ramda';
-import * as React from 'react';
-import { Stream } from './stream';
+import { mapProps } from 'recompose';
+import { Stream, StreamProps } from './stream';
 
-export const LimitedStream = ({
-  items,
-  limit,
-  title
-}: {
-  items: any;
+interface LimitedStreamProps extends StreamProps {
   limit: number;
-  title: string;
-}) => <Stream title={title} items={takeLast(limit, items)} />;
+}
+
+export const LimitedStream = mapProps((props: LimitedStreamProps) => ({
+  ...props,
+  items: takeLast(props.limit, props.items)
+}))(Stream);

@@ -23,5 +23,5 @@ const Editor = styled.div`
   box-shadow: 5px 0px 21px -9px rgba(0, 0, 0, 0.75);
   background-color: ${Colors.darkBrown};
   height: 100%;
-  flex-basis: 600px;
+  flex-basis: 450px;
 `;
