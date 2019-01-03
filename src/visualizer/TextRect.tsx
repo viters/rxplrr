@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { lefty } from './position-modifiers';
+import { lefty } from './positionModifiers';
 
 export const TextRect = ({
   text,
   rectColor,
   textColor,
   x,
-  y
+  y,
 }: {
   text: string;
   rectColor: string;

@@ -5,7 +5,7 @@ import { Layer, Stage } from 'react-konva';
 import { fromEvent, Subject } from 'rxjs';
 import { mapTo, startWith, takeUntil } from 'rxjs/operators';
 import styled from 'styled-components';
-import { StreamDisplay } from './stream-display';
+import { Stream } from './Stream';
 
 interface State {
   height: number;
@@ -14,7 +14,7 @@ interface State {
 
 const initialState: State = {
   height: 0,
-  width: 0
+  width: 0,
 };
 
 export class Screen extends React.Component<any, State> {
@@ -28,15 +28,15 @@ export class Screen extends React.Component<any, State> {
       .pipe(
         startWith(null),
         takeUntil(this.unsubscribe$),
-        mapTo(fromNullable(this.containerRef.current))
+        mapTo(fromNullable(this.containerRef.current)),
       )
       .subscribe(
         pipe(
           lift((x: HTMLElement) => x.getBoundingClientRect()),
           lift(pick(['height', 'width'])),
           (o: Option<{ height: number; width: number }>) =>
-            o.fold(null, x => this.setState(x))
-        )
+            o.fold(null, x => this.setState(x)),
+        ),
       );
   }
 
@@ -50,7 +50,7 @@ export class Screen extends React.Component<any, State> {
       <Container ref={this.containerRef}>
         <Stage {...this.state}>
           <Layer>
-            <StreamDisplay />
+            <Stream />
           </Layer>
         </Stage>
       </Container>

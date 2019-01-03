@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Colors } from '../../constants/colors';
-import { isEven } from '../../lib/numbers';
-import { LeftyTextRect } from './text-rect';
+import { Colors } from '../constants/colors';
+import { isEven } from '../lib/numbers';
+import { LeftyTextRect } from './TextRect';
 
 interface Props {
   position: number;
@@ -9,7 +9,7 @@ interface Props {
   onUpdate: (y: number) => void;
 }
 
-export class StreamItem extends React.Component<Props> {
+export class StreamBarItem extends React.Component<Props> {
   get y() {
     return (this.props.position + 1) * 30;
   }
@@ -31,7 +31,9 @@ export class StreamItem extends React.Component<Props> {
     return (
       <LeftyTextRect
         text={this.props.value.toString()}
-        rectColor={isEven(this.props.position) ? Colors.lightBlue : Colors.skinny}
+        rectColor={
+          isEven(this.props.position) ? Colors.lightBlue : Colors.skinny
+        }
         textColor={Colors.darkBrown}
         y={this.y}
       />

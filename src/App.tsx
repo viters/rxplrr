@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Colors } from './constants/colors';
-import { Screen } from './visualizer/components/screen';
+import { Screen } from './visualizer/Screen';
 
 export class App extends React.Component {
   public render() {
