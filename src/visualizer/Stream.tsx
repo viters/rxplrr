@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Group, Line } from 'react-konva';
-import { interval, of, Subject } from 'rxjs';
-import { delay, filter, map, mergeMap } from 'rxjs/operators';
-import { spawn, TaggedValue, wrapFactory } from './streamSpy';
+import { from, Subject } from 'rxjs';
 import { StreamBar } from './StreamBar';
 import { flatten, groupBy, values } from 'ramda';
 import { Colors } from '../constants/colors';
+import { Notification } from '../observer/interfaces';
+import { filter, map, switchMap } from '../observer/operators';
+import { observeCreator } from '../observer/observe';
 
 export interface State {
-  [stepId: string]: TaggedValue<any>[];
+  [stepId: string]: any[];
 }
 
 export class Stream extends React.Component<{}, State> {
@@ -18,36 +19,37 @@ export class Stream extends React.Component<{}, State> {
 
   private memory: any = {};
   private memory2: any[] = [];
-  private receiver = new Subject();
+  private receiver = new Subject<Notification<any>>();
 
   private memory3: any = {};
 
   constructor(props: {}) {
     super(props);
 
-    this.receiver.subscribe((v: TaggedValue<any>) => {
+    this.receiver.subscribe((v: any) => {
       console.log(v);
 
-      if (this.memory3[v.stepId]) {
-        this.memory3[v.stepId].push(v);
-      } else {
-        this.memory3[v.stepId] = [v];
-      }
-
-      this.setState({});
+      // if (this.memory3[v.step]) {
+      //   this.memory3[v.step].push(v);
+      // } else {
+      //   this.memory3[v.step] = [v];
+      // }
+      //
+      // this.setState({});
     });
 
     this.testFn.bind(this);
   }
 
   public componentDidMount() {
-    const wrap = wrapFactory(this.receiver);
+    const observe = observeCreator(this.receiver);
 
-    const stream1$ = interval(1000).pipe(
-      spawn(this.receiver),
-      wrap(mergeMap((x: number) => of(x + 5).pipe(delay(500)))),
-      wrap(filter((x: number) => x % 2 === 0)),
-      wrap(map((x: number) => x * 2)),
+    const stream1$ = from([1, 2]).pipe(
+      observe(
+        map(x => x * 2),
+        switchMap(x => [x, 2, 3]),
+        filter(x => x >= 4),
+      ),
     );
 
     stream1$.subscribe();

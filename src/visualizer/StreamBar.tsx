@@ -4,11 +4,10 @@ import { Colors } from '../constants/colors';
 import { StreamBarItem } from './StreamBarItem';
 import { LeftyTextRect } from './TextRect';
 import { takeLast } from 'ramda';
-import { TaggedValue } from './streamSpy';
 
 export interface StreamBarProps {
   title: string;
-  items: TaggedValue<any>[];
+  items: any[];
   x: number;
   y: number;
   limit: number;
@@ -24,7 +23,7 @@ export class StreamBar extends React.Component<StreamBarProps> {
     this.handleOnUpdate = this.handleOnUpdate.bind(this);
   }
 
-  handleOnUpdate(currentItems: TaggedValue<any>[], item: TaggedValue<any>) {
+  handleOnUpdate(currentItems: any[], item: any) {
     return (y: number) => {
       const currentKeys = currentItems
         .map(x => x.valueId)
