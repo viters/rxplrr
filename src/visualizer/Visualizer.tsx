@@ -3,11 +3,11 @@ import { Group } from 'react-konva';
 import { Notification } from '../observer/interfaces';
 import { observeCreator } from '../observer/observe';
 import { List, Map } from 'immutable';
-import { StreamBar } from './StreamBar';
 import * as Ops from '../observer/operators';
 import * as RxOps from 'rxjs/operators';
 import * as Rx from 'rxjs';
 import { OutgoingConnections } from './OutgoingConnections';
+import { Stream } from './Stream';
 
 export type VisualizeFn = (
   observe: typeof Rx.pipe,
@@ -22,35 +22,46 @@ export interface ValueConnections {
   children: Map<string, { x: number; y: number }>;
 }
 
-interface StreamProps {
+interface VisualizerProps {
   visualize: VisualizeFn;
+  onNotificationClick: (notification: Notification<any>) => void;
 }
 
-interface StreamState {
-  itemsBySteps: Map<number, List<Notification<any>>>;
+interface VisualizerState {
+  streams: Map<string, Map<number, List<Notification<any>>>>;
   valueConnectionsMap: Map<string, ValueConnections>;
 }
 
-export class Visualizer extends React.Component<StreamProps, StreamState> {
-  state: StreamState = { itemsBySteps: Map(), valueConnectionsMap: Map() };
+export class Visualizer extends React.Component<
+  VisualizerProps,
+  VisualizerState
+> {
+  state: VisualizerState = { streams: Map(), valueConnectionsMap: Map() };
 
   private unsubscribe$ = new Rx.Subject<void>();
 
   private receiver = new Rx.Subject<Notification<any>>();
 
-  constructor(props: StreamProps) {
+  constructor(props: VisualizerProps) {
     super(props);
 
     this.receiver
       .pipe(RxOps.takeUntil(this.unsubscribe$))
       .subscribe((notification: Notification<any>) => {
         this.setState(state => {
-          const key = notification.step;
-          const currentItems = state.itemsBySteps.get(key);
-          const newItems = (currentItems || List()).push(notification);
+          const streamKey = notification.streamId;
+          const stepsMap = state.streams.get(streamKey) || Map();
+
+          const stepKey = notification.step;
+          const notifications = stepsMap.get(stepKey) || List();
+
+          const newStepsMap = stepsMap.set(
+            stepKey,
+            notifications.push(notification),
+          );
 
           return {
-            itemsBySteps: state.itemsBySteps.set(key, newItems),
+            streams: state.streams.set(streamKey, newStepsMap),
           };
         });
       });
@@ -136,19 +147,19 @@ export class Visualizer extends React.Component<StreamProps, StreamState> {
   render() {
     return (
       <Group>
-        {this.state.itemsBySteps.keySeq().map(step => (
-          <StreamBar
-            key={step}
-            x={150 * step}
-            y={0}
-            title={step.toString()}
-            items={this.state.itemsBySteps.get(step)}
-            limit={10}
-            onItemHide={this.handleItemHide}
-            onItemReposition={this.handleNotificationReposition}
-            onItemClick={notification => console.log(notification)}
-          />
-        ))}
+        <Group>
+          {this.state.streams.keySeq().map((streamId, i) => (
+            <Stream
+              key={streamId}
+              streamId={streamId}
+              position={i}
+              notificationsBySteps={this.state.streams.get(streamId)}
+              onItemHide={this.handleItemHide}
+              onItemReposition={this.handleNotificationReposition}
+              onItemClick={this.props.onNotificationClick}
+            />
+          ))}
+        </Group>
         {this.state.valueConnectionsMap
           .valueSeq()
           .map((valueConnections, index) => (

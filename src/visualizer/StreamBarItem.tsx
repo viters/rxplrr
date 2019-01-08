@@ -44,7 +44,11 @@ export class StreamBarItem extends React.Component<StreamBarItemProps> {
       return value.toString();
     }
 
-    return this.props.notification.type;
+    if (this.props.notification.type === 'E') {
+      return '!ERROR!';
+    }
+
+    return '|COMPLETED|';
   }
 
   componentDidMount() {
