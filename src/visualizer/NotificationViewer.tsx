@@ -17,7 +17,7 @@ export const NotificationViewer = ({
       </div>
       {notification.type === 'N' && (
         <div>
-          <strong>Value:</strong> {JSON.stringify(notification.valueMeta.value)}
+          <strong>Value:</strong> {JSON.stringify(notification.valueMeta.value, null, 2)}
         </div>
       )}
       {notification.type === 'E' && (

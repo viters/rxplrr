@@ -55,7 +55,7 @@ export class App extends React.Component<
     return (
       <FlexRow>
         <Sidebar>
-          <div>Input</div>
+          <div />
           <NotificationViewer notification={this.state.notification} />
         </Sidebar>
         <Screen
