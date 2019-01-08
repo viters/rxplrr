@@ -2,28 +2,39 @@ import { fromNullable, Option } from 'fp-ts/lib/Option';
 import { lift, pick, pipe } from 'ramda';
 import * as React from 'react';
 import { Layer, Stage } from 'react-konva';
-import { fromEvent, Subject } from 'rxjs';
+import { from, fromEvent, Subject } from 'rxjs';
 import { mapTo, startWith, takeUntil } from 'rxjs/operators';
 import styled from 'styled-components';
-import { Stream } from './Stream';
+import { Visualizer, VisualizeFn } from './Visualizer';
 
-interface State {
+interface ScreenState {
   height: number;
   width: number;
 }
 
-const initialState: State = {
+const initialState: ScreenState = {
   height: 0,
   width: 0,
 };
 
-export class Screen extends React.Component<any, State> {
-  public state = initialState;
+const createInputStream: VisualizeFn = (observe, ops, rx, rxOps) => {
+  rx.from([1, 2, 3])
+    .pipe(
+      observe(
+        ops.mergeMap(x => rx.of(x).pipe(rxOps.delay(Math.random() * 5000))),
+        ops.map(x => x * 5),
+      ),
+    )
+    .subscribe();
+};
+
+export class Screen extends React.Component<any, ScreenState> {
+  state = initialState;
 
   private unsubscribe$ = new Subject<void>();
   private containerRef = React.createRef<any>();
 
-  public componentDidMount() {
+  componentDidMount() {
     fromEvent(window, 'resize')
       .pipe(
         startWith(null),
@@ -40,17 +51,22 @@ export class Screen extends React.Component<any, State> {
       );
   }
 
-  public componentWillUnmount() {
+  componentWillUnmount() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
-  public render() {
+  render() {
     return (
       <Container ref={this.containerRef}>
-        <Stage {...this.state}>
+        <Stage
+          height={this.state.height - 50}
+          offsetY={-50}
+          width={this.state.width - 50}
+          offsetX={-50}
+        >
           <Layer>
-            <Stream />
+            <Visualizer visualize={createInputStream} />
           </Layer>
         </Stage>
       </Container>

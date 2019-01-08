@@ -4,10 +4,28 @@ export interface ValueMeta<T> {
   valueId: string;
 }
 
-export interface Notification<T> {
+interface NotificationBase {
   step: number;
   streamId: string;
   timestamp: number;
-  type: 'N' | 'E' | 'C';
-  value: ValueMeta<T> | { error: any } | null;
 }
+
+export interface NextNotification<T> extends NotificationBase {
+  type: 'N';
+  valueMeta: ValueMeta<T>;
+}
+
+export interface ErrorNotification extends NotificationBase {
+  type: 'E';
+  valueMeta: { error: any };
+}
+
+export interface CompletedNotification extends NotificationBase {
+  type: 'C';
+  valueMeta: null;
+}
+
+export type Notification<T> =
+  | NextNotification<T>
+  | ErrorNotification
+  | CompletedNotification;

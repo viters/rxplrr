@@ -2,40 +2,86 @@ import * as React from 'react';
 import { Colors } from '../constants/colors';
 import { isEven } from '../lib/numbers';
 import { LeftyTextRect } from './TextRect';
+import { Notification } from '../observer/interfaces';
 
-interface Props {
+interface StreamBarItemProps {
   position: number;
-  value: any;
-  onUpdate: (y: number) => void;
+  notification: Notification<any>;
+  onReposition?: (notification: Notification<any>, yOffset: number) => void;
+  onHide?: (notification: Notification<any>) => void;
+  onClick?: (notification: Notification<any>) => void;
 }
 
-export class StreamBarItem extends React.Component<Props> {
-  get y() {
+export class StreamBarItem extends React.Component<StreamBarItemProps> {
+  get yOffset() {
     return (this.props.position + 1) * 30;
   }
 
-  public componentDidMount() {
-    this.props.onUpdate(this.y);
+  get text(): string {
+    if (this.props.notification.type === 'N') {
+      const value = this.props.notification.valueMeta.value;
+
+      if (Array.isArray(value)) {
+        return '[Array]';
+      }
+
+      if (typeof value === 'function') {
+        return '(Function)';
+      }
+
+      if (typeof value === 'object' && value !== null) {
+        return '{Object}';
+      }
+
+      if (value === undefined) {
+        return '|undefined|';
+      }
+
+      if (value === null) {
+        return '|null|';
+      }
+
+      return value.toString();
+    }
+
+    return this.props.notification.type;
   }
 
-  public componentDidUpdate(prevProps: Props) {
+  componentDidMount() {
+    this.notifyReposition();
+  }
+
+  componentDidUpdate(prevProps: StreamBarItemProps) {
     if (
-      this.props.value !== prevProps.value ||
+      this.props.notification !== prevProps.notification ||
       this.props.position !== prevProps.position
     ) {
-      this.props.onUpdate(this.y);
+      this.notifyReposition();
     }
   }
 
-  public render() {
+  notifyReposition() {
+    if (this.props.onReposition && this.props.position >= 0) {
+      this.props.onReposition(this.props.notification, this.yOffset);
+    } else if (this.props.onHide && this.props.position < 0) {
+      this.props.onHide(this.props.notification);
+    }
+  }
+
+  render() {
+    if (this.props.position < 0) {
+      return null;
+    }
+
     return (
       <LeftyTextRect
-        text={this.props.value.toString()}
+        text={this.text}
         rectColor={
           isEven(this.props.position) ? Colors.lightBlue : Colors.skinny
         }
         textColor={Colors.darkBrown}
-        y={this.y}
+        y={this.yOffset}
+        onClick={() => this.props.onClick(this.props.notification)}
       />
     );
   }

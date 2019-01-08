@@ -45,7 +45,17 @@ export const filter = new Proxy(RxOps.filter, {
     applyNextMeta(target(sinkMeta(argumentsList[0]), thisArg)),
 });
 
+export const delay = new Proxy(RxOps.delay, {
+  apply: (target, thisArg, argumentsList) =>
+    applyNextMeta(target(argumentsList[0], argumentsList[1])),
+});
+
 export const switchMap = new Proxy(RxOps.switchMap, {
+  apply: (target, thisArg, argumentsList) =>
+    target(pipeMeta(argumentsList[0]), argumentsList[1]),
+});
+
+export const mergeMap = new Proxy(RxOps.mergeMap, {
   apply: (target, thisArg, argumentsList) =>
     target(pipeMeta(argumentsList[0]), argumentsList[1]),
 });

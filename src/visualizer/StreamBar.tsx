@@ -3,45 +3,46 @@ import { Group } from 'react-konva';
 import { Colors } from '../constants/colors';
 import { StreamBarItem } from './StreamBarItem';
 import { LeftyTextRect } from './TextRect';
-import { takeLast } from 'ramda';
+import { List } from 'immutable';
+import { Notification } from '../observer/interfaces';
 
-export interface StreamBarProps {
+const getKeyForNotification = (notification: Notification<any>): string =>
+  `${notification.timestamp}${notification.type}${notification.type === 'N' &&
+    notification.valueMeta.valueId}`;
+
+const getNotificationPosition = (index: number, size: number, limit: number) =>
+  size <= limit ? index : index - size + limit;
+
+interface StreamBarProps {
   title: string;
-  items: any[];
+  items: List<Notification<any>>;
   x: number;
   y: number;
   limit: number;
-  onUpdate: (items: any[]) => void;
+  onItemReposition?: (
+    notification: Notification<any>,
+    x: number,
+    y: number,
+  ) => void;
+  onItemHide?: (notification: Notification<any>) => void;
+  onItemClick?: (notification: Notification<any>) => void;
 }
 
 export class StreamBar extends React.Component<StreamBarProps> {
-  private memory: { valueId: number; x: number; y: number }[] = [];
-
   constructor(props: StreamBarProps) {
     super(props);
 
-    this.handleOnUpdate = this.handleOnUpdate.bind(this);
+    this.handleItemReposition = this.handleItemReposition.bind(this);
   }
 
-  handleOnUpdate(currentItems: any[], item: any) {
-    return (y: number) => {
-      const currentKeys = currentItems
-        .map(x => x.valueId)
-        .filter(x => x !== item.valueId);
-
-      this.memory = this.memory.filter(x =>
-        currentKeys.some(y => x.valueId === y),
-      );
-
-      this.memory.push({ y, valueId: item.valueId, x: this.props.x });
-
-      this.props.onUpdate(this.memory);
-    };
+  handleItemReposition(notification: Notification<any>, yOffset: number) {
+    if (this.props.onItemReposition) {
+      const realY = this.props.y + yOffset;
+      this.props.onItemReposition(notification, this.props.x, realY);
+    }
   }
 
   render() {
-    const currentItems = takeLast(this.props.limit, this.props.items);
-
     return (
       <Group x={this.props.x} y={this.props.y}>
         <LeftyTextRect
@@ -50,12 +51,18 @@ export class StreamBar extends React.Component<StreamBarProps> {
           rectColor={Colors.purplish}
           textColor={Colors.white}
         />
-        {currentItems.map((v, i) => (
+        {this.props.items.map((not, index) => (
           <StreamBarItem
-            key={i}
-            value={v.hasValue ? v.value : v.kind}
-            position={i}
-            onUpdate={this.handleOnUpdate(currentItems, v)}
+            key={getKeyForNotification(not)}
+            notification={not}
+            position={getNotificationPosition(
+              index,
+              this.props.items.size,
+              this.props.limit,
+            )}
+            onReposition={this.handleItemReposition}
+            onHide={this.props.onItemHide}
+            onClick={this.props.onItemClick}
           />
         ))}
       </Group>

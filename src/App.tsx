@@ -4,7 +4,7 @@ import { Colors } from './constants/colors';
 import { Screen } from './visualizer/Screen';
 
 export class App extends React.Component {
-  public render() {
+  render() {
     return (
       <FlexRow>
         <Editor />
