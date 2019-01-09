@@ -32,7 +32,7 @@ export const NotificationViewer = ({
         {new Date(notification.timestamp).toLocaleString()}
       </div>
       <div>
-        <strong>Step:</strong> {notification.step}
+        <strong>Step:</strong> {notification.stepName}({notification.step})
       </div>
       <div>
         <strong>Stream:</strong> {notification.streamId}

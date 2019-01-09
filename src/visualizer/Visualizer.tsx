@@ -4,8 +4,9 @@ import styled, { css } from 'styled-components';
 import { VisualizeFn, VisualizeManager } from './VisualizeManager';
 import { Notification } from '../observer/interfaces';
 import { Colors } from '../constants/colors';
+import { NotificationViewer } from './NotificationViewer';
 
-const Container = styled.div<{ hidden: boolean }>`
+const Container = styled.div<{ hide: boolean }>`
   position: fixed;
   left: 0;
   right: 0;
@@ -13,11 +14,15 @@ const Container = styled.div<{ hidden: boolean }>`
   top: 0;
   z-index: 1000;
   background-color: #fff;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 300ms;
 
   ${props =>
-    props.hidden &&
+    props.hide &&
     css`
-      display: none;
+      transform: translateY(-100%);
+      opacity: 0;
     `};
 `;
 
@@ -40,6 +45,17 @@ const VisualizerButton = styled.button`
   }
 `;
 
+const NotificationViewerContainer = styled.div`
+  position: fixed;
+  bottom: 150px;
+  right: 50px;
+  z-index: 1001;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: ${Colors.darkBrown};
+  color: white;
+`;
+
 interface ScreenProps {
   visualize: VisualizeFn;
   onNotificationClick?: (notification: Notification<any>) => void;
@@ -49,6 +65,7 @@ interface ScreenState {
   height: number;
   width: number;
   visible: boolean;
+  zoomedNotification: Notification<any>;
 }
 
 export class Visualizer extends React.Component<ScreenProps, ScreenState> {
@@ -56,6 +73,7 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
     height: 0,
     width: 0,
     visible: false,
+    zoomedNotification: null,
   };
 
   constructor(props) {
@@ -82,6 +100,8 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
   }
 
   handleNotificationClick(notification: Notification<any>) {
+    this.setState({ zoomedNotification: notification });
+
     if (this.props.onNotificationClick) {
       this.props.onNotificationClick(notification);
     }
@@ -90,7 +110,7 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
   render() {
     return (
       <div>
-        <Container hidden={!this.state.visible}>
+        <Container hide={!this.state.visible}>
           <Stage
             height={this.state.height - 50}
             offsetY={-50}
@@ -104,6 +124,13 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
               />
             </Layer>
           </Stage>
+          {this.state.zoomedNotification && (
+            <NotificationViewerContainer>
+              <NotificationViewer
+                notification={this.state.zoomedNotification}
+              />
+            </NotificationViewerContainer>
+          )}
         </Container>
         <VisualizerButton onClick={this.handleVisibilityClick}>
           <img src={require('./logo.png')} />
