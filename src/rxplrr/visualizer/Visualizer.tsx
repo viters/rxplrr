@@ -5,6 +5,7 @@ import { VisualizeManager } from './VisualizeManager';
 import { Notification, VisualizeFn } from '../types';
 import { Colors } from '../constants/colors';
 import { NotificationViewer } from './NotificationViewer';
+import { VisualizerButton } from './VisualizerButton';
 
 const Container = styled.div<{ hide: boolean }>`
   position: fixed;
@@ -24,25 +25,6 @@ const Container = styled.div<{ hide: boolean }>`
       transform: translateY(-100%);
       opacity: 0;
     `};
-`;
-
-const VisualizerButton = styled.button`
-  position: fixed;
-  bottom: 50px;
-  right: 50px;
-  z-index: 1001;
-  width: 64px;
-  height: 64px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  background-color: ${Colors.darkBrown};
-  border: 6px solid ${Colors.darkBrown};
-  cursor: pointer;
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
 `;
 
 const NotificationViewerContainer = styled.div`
@@ -112,10 +94,10 @@ export class Visualizer extends React.Component<VisualizerProps, VisualizerState
       <div>
         <Container hide={!this.state.visible}>
           <Stage
-            height={this.state.height - 50}
-            offsetY={-50}
-            width={this.state.width - 50}
-            offsetX={-50}
+            height={this.state.height - 25}
+            offsetY={-25}
+            width={this.state.width - 25}
+            offsetX={-25}
           >
             <Layer>
               <VisualizeManager

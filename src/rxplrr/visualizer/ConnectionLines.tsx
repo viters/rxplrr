@@ -4,7 +4,7 @@ import { Colors } from '../constants/colors';
 import { Group, Line } from 'react-konva';
 import { rectSizes } from './rectSizes';
 
-interface OutgoingConnectionsProps {
+interface ConnectionLinesProps {
   startOffsetX?: number;
   startOffsetY?: number;
   endOffsetX?: number;
@@ -14,11 +14,7 @@ interface OutgoingConnectionsProps {
 
 export const ConnectionLines = ({
   valueConnections,
-}: OutgoingConnectionsProps) => {
-  if (!valueConnections.visible) {
-    return null;
-  }
-
+}: ConnectionLinesProps) => {
   const endOffsetX = 10;
   const startOffsetX = rectSizes.width - endOffsetX;
   const offsetY = rectSizes.height / 2;

@@ -10,32 +10,31 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export interface ValueConnections {
-  visible: boolean;
   parent: { x: number; y: number };
   children: Map<string, { x: number; y: number }>;
 }
 
-interface VisualizerProps {
+interface VisualizeManagerProps {
   observeHook: VisualizeFn;
   onNotificationClick: (notification: Notification<any>) => void;
 }
 
-interface VisualizerState {
+interface VisualizeManagerState {
   streams: Map<string, Map<number, List<Notification<any>>>>;
-  valueConnectionsMap: Map<string, ValueConnections>;
+  valueConnections: Map<string, ValueConnections>;
 }
 
 export class VisualizeManager extends React.Component<
-  VisualizerProps,
-  VisualizerState
+  VisualizeManagerProps,
+  VisualizeManagerState
 > {
-  state: VisualizerState = { streams: Map(), valueConnectionsMap: Map() };
+  state: VisualizeManagerState = { streams: Map(), valueConnections: Map() };
 
   private unsubscribe$ = new Subject<void>();
 
   private receiver = new Subject<Notification<any>>();
 
-  constructor(props: VisualizerProps) {
+  constructor(props: VisualizeManagerProps) {
     super(props);
 
     this.receiver
@@ -86,31 +85,33 @@ export class VisualizeManager extends React.Component<
     }
 
     this.setState(state => {
-      let updatedMap = state.valueConnectionsMap;
+      let updatedMap = state.valueConnections;
 
       const currentKey = notification.valueMeta.valueId;
-      const current = state.valueConnectionsMap.get(currentKey);
+      const current = state.valueConnections.get(currentKey);
       const currentWithNewPosition = {
         ...(current || { children: Map() }),
         parent: { x, y },
-        visible: true,
       };
 
       updatedMap = updatedMap.set(currentKey, currentWithNewPosition);
 
       if (notification.valueMeta.previousValueId !== null) {
         const previousKey = notification.valueMeta.previousValueId;
-        const parent = state.valueConnectionsMap.get(previousKey);
-        const parentWithNewChild = {
-          ...parent,
-          children: parent.children.set(currentKey, { x, y }),
-        };
+        const parent = state.valueConnections.get(previousKey);
 
-        updatedMap = updatedMap.set(previousKey, parentWithNewChild);
+        if (parent) {
+          const parentWithNewChild = {
+            ...parent,
+            children: parent.children.set(currentKey, { x, y }),
+          };
+
+          updatedMap = updatedMap.set(previousKey, parentWithNewChild);
+        }
       }
 
       return {
-        valueConnectionsMap: updatedMap,
+        valueConnections: updatedMap,
       };
     });
   }
@@ -122,17 +123,24 @@ export class VisualizeManager extends React.Component<
 
     this.setState(state => {
       const currentKey = notification.valueMeta.valueId;
-      const current = state.valueConnectionsMap.get(currentKey);
-      const currentHidden = {
-        ...(current || { children: Map(), parent: { x: 0, y: 0 } }),
-        visible: false,
-      };
+      let updatedMap = state.valueConnections.remove(currentKey);
+
+      if (notification.valueMeta.previousValueId !== null) {
+        const previousKey = notification.valueMeta.previousValueId;
+        const parent = state.valueConnections.get(previousKey);
+
+        if (parent) {
+          const parentWithoutCurrent = {
+            ...parent,
+            children: parent.children.remove(currentKey),
+          };
+
+          updatedMap = updatedMap.set(previousKey, parentWithoutCurrent);
+        }
+      }
 
       return {
-        valueConnectionsMap: state.valueConnectionsMap.set(
-          currentKey,
-          currentHidden,
-        ),
+        valueConnections: updatedMap,
       };
     });
   }
@@ -153,13 +161,10 @@ export class VisualizeManager extends React.Component<
             />
           ))}
         </Group>
-        {this.state.valueConnectionsMap
+        {this.state.valueConnections
           .valueSeq()
           .map((valueConnections, index) => (
-            <ConnectionLines
-              key={index}
-              valueConnections={valueConnections}
-            />
+            <ConnectionLines key={index} valueConnections={valueConnections} />
           ))}
       </Group>
     );

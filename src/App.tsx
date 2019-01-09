@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Visualizer, VisualizeFn } from './rxplrr';
 import styled from 'styled-components';
-import { interval, of, throwError } from 'rxjs';
+import { from, interval, of, throwError } from 'rxjs';
 import { delay, switchMap } from 'rxjs/operators';
 
 const Container = styled.div`
@@ -15,7 +15,9 @@ const observeHook: VisualizeFn = (observe, ops) => {
     .pipe(
       observe(['map', 'mergeMap', 'filter', 'mergeMap'])(
         ops.map(x => x * 3),
-        ops.mergeMap(x => of(x).pipe(delay(Math.random() * 5000))),
+        ops.mergeMap(x =>
+          from([x, 2, 3, 4, 5]).pipe(delay(Math.random() * 5000)),
+        ),
         ops.filter(x => x % 2 === 0),
         ops.mergeMap(x =>
           of(String.fromCharCode(97 + (x % 27))).pipe(
