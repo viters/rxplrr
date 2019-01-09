@@ -4,7 +4,7 @@ import { Colors } from '../constants/colors';
 import { StreamBarItem } from './StreamBarItem';
 import { LeftyTextRect } from './TextRect';
 import { List } from 'immutable';
-import { Notification } from '../observer/interfaces';
+import { Notification } from '../types';
 
 const getKeyForNotification = (notification: Notification<any>): string =>
   `${notification.timestamp}${notification.type}${notification.type === 'N' &&

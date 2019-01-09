@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Notification } from '../observer/interfaces';
+import { Notification } from '../types';
 import { List, Map } from 'immutable';
 import { StreamBar } from './StreamBar';
 import { Group } from 'react-konva';

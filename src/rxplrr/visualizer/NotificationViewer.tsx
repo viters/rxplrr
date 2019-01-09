@@ -1,4 +1,4 @@
-import { Notification } from '../observer/interfaces';
+import { Notification } from '../types';
 import * as React from 'react';
 import JSONPretty from 'react-json-pretty';
 

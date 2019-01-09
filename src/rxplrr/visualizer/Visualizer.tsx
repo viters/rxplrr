@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Layer, Stage } from 'react-konva';
 import styled, { css } from 'styled-components';
-import { VisualizeFn, VisualizeManager } from './VisualizeManager';
-import { Notification } from '../observer/interfaces';
+import { VisualizeManager } from './VisualizeManager';
+import { Notification, VisualizeFn } from '../types';
 import { Colors } from '../constants/colors';
 import { NotificationViewer } from './NotificationViewer';
 
@@ -132,6 +132,7 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
             </NotificationViewerContainer>
           )}
         </Container>
+
         <VisualizerButton onClick={this.handleVisibilityClick}>
           <img src={require('./logo.png')} />
         </VisualizerButton>

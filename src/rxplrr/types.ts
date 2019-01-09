@@ -1,3 +1,6 @@
+import { pipe } from 'rxjs';
+import * as Ops from './observer/operators';
+
 export interface ValueMeta<T> {
   previousValueId: string | null;
   value: T;
@@ -30,3 +33,8 @@ export type Notification<T> =
   | NextNotification<T>
   | ErrorNotification
   | CompletedNotification;
+
+export type VisualizeFn = (
+  observe: (stepNames: string[]) => typeof pipe,
+  ops: typeof Ops,
+) => void;

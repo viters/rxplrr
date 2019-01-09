@@ -1,7 +1,7 @@
 import { from, Observable, OperatorFunction, pipe } from 'rxjs';
 import * as RxOps from 'rxjs/operators';
 import { generateId } from './utils';
-import { ValueMeta } from './interfaces';
+import { ValueMeta } from '../types';
 
 const nextMeta = <T, R>(value: T, meta: ValueMeta<R>): ValueMeta<T> => ({
   value,

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Colors } from '../constants/colors';
 import { isEven } from '../lib/numbers';
 import { LeftyTextRect } from './TextRect';
-import { Notification } from '../observer/interfaces';
+import { Notification } from '../types';
 import { rectSizes } from './rectSizes';
 
 interface StreamBarItemProps {

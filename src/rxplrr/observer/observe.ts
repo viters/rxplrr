@@ -1,7 +1,7 @@
 import { generateId, generateTimestamp } from './utils';
 import { Observable, pipe, Subject } from 'rxjs';
 import * as RxOps from 'rxjs/operators';
-import { Notification, ValueMeta } from './interfaces';
+import { Notification, ValueMeta } from '../types';
 
 const init = () => <T>(source: Observable<T>): Observable<ValueMeta<T>> =>
   source.pipe(
@@ -68,7 +68,10 @@ export const observeCreator = (receiver: Subject<Notification<any>>) => (
       const copy = copyCreator(receiver, generateId());
       const observedOperators = argumentsList.reduce(
         (operators: any[], next: any, step: number) =>
-          operators.concat([next, copy(step + 1, stepNames[step] || '')]),
+          operators.concat([
+            next,
+            copy(step + 1, (stepNames || [])[step] || ''),
+          ]),
         [],
       );
 

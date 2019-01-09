@@ -1,20 +1,13 @@
 import * as React from 'react';
 import { Group } from 'react-konva';
-import { Notification } from '../observer/interfaces';
+import { Notification, VisualizeFn } from '../types';
 import { observeCreator } from '../observer/observe';
 import { List, Map } from 'immutable';
 import * as Ops from '../observer/operators';
-import * as RxOps from 'rxjs/operators';
-import * as Rx from 'rxjs';
 import { OutgoingConnections } from './OutgoingConnections';
 import { Stream } from './Stream';
-
-export type VisualizeFn = (
-  observe: (stepNames: string[]) => typeof Rx.pipe,
-  ops: typeof Ops,
-  rx: typeof Rx,
-  rxOps: typeof RxOps,
-) => void;
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface ValueConnections {
   visible: boolean;
@@ -38,15 +31,15 @@ export class VisualizeManager extends React.Component<
 > {
   state: VisualizerState = { streams: Map(), valueConnectionsMap: Map() };
 
-  private unsubscribe$ = new Rx.Subject<void>();
+  private unsubscribe$ = new Subject<void>();
 
-  private receiver = new Rx.Subject<Notification<any>>();
+  private receiver = new Subject<Notification<any>>();
 
   constructor(props: VisualizerProps) {
     super(props);
 
     this.receiver
-      .pipe(RxOps.takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((notification: Notification<any>) => {
         this.setState(state => {
           const streamKey = notification.streamId;
@@ -75,7 +68,7 @@ export class VisualizeManager extends React.Component<
   componentDidMount() {
     const observe = observeCreator(this.receiver);
 
-    this.props.visualize(observe, Ops, Rx, RxOps);
+    this.props.visualize(observe, Ops);
   }
 
   componentWillUnmount() {
