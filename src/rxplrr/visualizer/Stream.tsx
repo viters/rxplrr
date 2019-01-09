@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Notification } from '../types';
 import { List, Map } from 'immutable';
-import { StreamBar } from './StreamBar';
+import { StreamColumn } from './StreamColumn';
 import { Group } from 'react-konva';
 import { rectSizes } from './rectSizes';
 
@@ -31,7 +31,7 @@ export const Stream = (props: StreamProps) => {
   return (
     <Group>
       {props.notificationsBySteps.keySeq().map(step => (
-        <StreamBar
+        <StreamColumn
           key={step}
           x={(rectSizes.width + 50) * step}
           y={offsetY}

@@ -4,7 +4,7 @@ import { Notification, VisualizeFn } from '../types';
 import { observeCreator } from '../observer/observe';
 import { List, Map } from 'immutable';
 import * as Ops from '../observer/operators';
-import { OutgoingConnections } from './OutgoingConnections';
+import { ConnectionLines } from './ConnectionLines';
 import { Stream } from './Stream';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,7 +16,7 @@ export interface ValueConnections {
 }
 
 interface VisualizerProps {
-  visualize: VisualizeFn;
+  observeHook: VisualizeFn;
   onNotificationClick: (notification: Notification<any>) => void;
 }
 
@@ -68,7 +68,7 @@ export class VisualizeManager extends React.Component<
   componentDidMount() {
     const observe = observeCreator(this.receiver);
 
-    this.props.visualize(observe, Ops);
+    this.props.observeHook(observe, Ops);
   }
 
   componentWillUnmount() {
@@ -156,7 +156,7 @@ export class VisualizeManager extends React.Component<
         {this.state.valueConnectionsMap
           .valueSeq()
           .map((valueConnections, index) => (
-            <OutgoingConnections
+            <ConnectionLines
               key={index}
               valueConnections={valueConnections}
             />

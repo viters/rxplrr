@@ -12,7 +12,7 @@ interface OutgoingConnectionsProps {
   valueConnections: ValueConnections;
 }
 
-export const OutgoingConnections = ({
+export const ConnectionLines = ({
   valueConnections,
 }: OutgoingConnectionsProps) => {
   if (!valueConnections.visible) {

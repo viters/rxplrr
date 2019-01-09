@@ -56,19 +56,19 @@ const NotificationViewerContainer = styled.div`
   color: white;
 `;
 
-interface ScreenProps {
-  visualize: VisualizeFn;
+interface VisualizerProps {
+  observeHook: VisualizeFn;
   onNotificationClick?: (notification: Notification<any>) => void;
 }
 
-interface ScreenState {
+interface VisualizerState {
   height: number;
   width: number;
   visible: boolean;
   zoomedNotification: Notification<any>;
 }
 
-export class Visualizer extends React.Component<ScreenProps, ScreenState> {
+export class Visualizer extends React.Component<VisualizerProps, VisualizerState> {
   state = {
     height: 0,
     width: 0,
@@ -119,7 +119,7 @@ export class Visualizer extends React.Component<ScreenProps, ScreenState> {
           >
             <Layer>
               <VisualizeManager
-                visualize={this.props.visualize}
+                observeHook={this.props.observeHook}
                 onNotificationClick={this.handleNotificationClick}
               />
             </Layer>

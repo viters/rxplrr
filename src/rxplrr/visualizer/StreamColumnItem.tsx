@@ -5,7 +5,7 @@ import { LeftyTextRect } from './TextRect';
 import { Notification } from '../types';
 import { rectSizes } from './rectSizes';
 
-interface StreamBarItemProps {
+interface StreamColumnItemProps {
   position: number;
   notification: Notification<any>;
   onReposition?: (notification: Notification<any>, yOffset: number) => void;
@@ -13,7 +13,7 @@ interface StreamBarItemProps {
   onClick?: (notification: Notification<any>) => void;
 }
 
-export class StreamBarItem extends React.Component<StreamBarItemProps> {
+export class StreamColumnItem extends React.Component<StreamColumnItemProps> {
   get yOffset() {
     return (this.props.position + 1) * rectSizes.height;
   }
@@ -56,7 +56,7 @@ export class StreamBarItem extends React.Component<StreamBarItemProps> {
     this.notifyReposition();
   }
 
-  componentDidUpdate(prevProps: StreamBarItemProps) {
+  componentDidUpdate(prevProps: StreamColumnItemProps) {
     if (
       this.props.notification !== prevProps.notification ||
       this.props.position !== prevProps.position

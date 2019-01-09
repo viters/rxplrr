@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Visualizer } from './rxplrr';
-import { VisualizeFn } from './rxplrr';
+import { Visualizer, VisualizeFn } from './rxplrr';
 import styled from 'styled-components';
 import { interval, of, throwError } from 'rxjs';
 import { delay, switchMap } from 'rxjs/operators';
@@ -11,7 +10,7 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const mockInput: VisualizeFn = (observe, ops) => {
+const observeHook: VisualizeFn = (observe, ops) => {
   interval(2000)
     .pipe(
       observe(['map', 'mergeMap', 'filter', 'mergeMap'])(
@@ -24,6 +23,16 @@ const mockInput: VisualizeFn = (observe, ops) => {
             switchMap(x => (x === 's' ? throwError('Cannot use s!') : of(x))),
           ),
         ),
+      ),
+    )
+    .subscribe();
+
+  interval(4000)
+    .pipe(
+      observe(['map', 'into object', 'into array'])(
+        ops.map(x => x * 15),
+        ops.map(x => ({ x })),
+        ops.map(x => [x]),
       ),
     )
     .subscribe();
@@ -44,6 +53,6 @@ export const App = () => (
       </p>
     </Container>
 
-    <Visualizer visualize={mockInput} />
+    <Visualizer observeHook={observeHook} />
   </div>
 );

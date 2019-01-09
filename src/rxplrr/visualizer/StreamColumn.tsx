@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Group } from 'react-konva';
 import { Colors } from '../constants/colors';
-import { StreamBarItem } from './StreamBarItem';
+import { StreamColumnItem } from './StreamColumnItem';
 import { LeftyTextRect } from './TextRect';
 import { List } from 'immutable';
 import { Notification } from '../types';
@@ -13,7 +13,7 @@ const getKeyForNotification = (notification: Notification<any>): string =>
 const getNotificationPosition = (index: number, size: number, limit: number) =>
   size <= limit ? index : index - size + limit;
 
-interface StreamBarProps {
+interface StreamColumnProps {
   title: string;
   items: List<Notification<any>>;
   x: number;
@@ -28,8 +28,8 @@ interface StreamBarProps {
   onItemClick?: (notification: Notification<any>) => void;
 }
 
-export class StreamBar extends React.Component<StreamBarProps> {
-  constructor(props: StreamBarProps) {
+export class StreamColumn extends React.Component<StreamColumnProps> {
+  constructor(props: StreamColumnProps) {
     super(props);
 
     this.handleItemReposition = this.handleItemReposition.bind(this);
@@ -52,7 +52,7 @@ export class StreamBar extends React.Component<StreamBarProps> {
           textColor={Colors.white}
         />
         {this.props.items.map((not, index) => (
-          <StreamBarItem
+          <StreamColumnItem
             key={getKeyForNotification(not)}
             notification={not}
             position={getNotificationPosition(
