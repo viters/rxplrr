@@ -3,6 +3,7 @@ import { Notification } from '../observer/interfaces';
 import { List, Map } from 'immutable';
 import { StreamBar } from './StreamBar';
 import { Group } from 'react-konva';
+import { rectSizes } from './rectSizes';
 
 interface StreamProps {
   streamId: string;
@@ -18,8 +19,13 @@ interface StreamProps {
 }
 
 export const Stream = (props: StreamProps) => {
-  const createTitle = (step: number) =>
-    `${props.streamId.slice(0, 5)}: ${step.toString()}`;
+  const createTitle = (step: number) => {
+    const stepName = props.notificationsBySteps
+      .get(step)
+      .first({ stepName: '' }).stepName;
+
+    return `${props.streamId.slice(0, 3)}: ${stepName}(${step.toString()})`;
+  };
   const offsetY = 360 * props.position;
 
   return (
@@ -27,7 +33,7 @@ export const Stream = (props: StreamProps) => {
       {props.notificationsBySteps.keySeq().map(step => (
         <StreamBar
           key={step}
-          x={150 * step}
+          x={(rectSizes.width + 50) * step}
           y={offsetY}
           title={createTitle(step)}
           items={props.notificationsBySteps.get(step)}

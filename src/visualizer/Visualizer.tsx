@@ -1,178 +1,114 @@
 import * as React from 'react';
-import { Group } from 'react-konva';
+import { Layer, Stage } from 'react-konva';
+import styled, { css } from 'styled-components';
+import { VisualizeFn, VisualizeManager } from './VisualizeManager';
 import { Notification } from '../observer/interfaces';
-import { observeCreator } from '../observer/observe';
-import { List, Map } from 'immutable';
-import * as Ops from '../observer/operators';
-import * as RxOps from 'rxjs/operators';
-import * as Rx from 'rxjs';
-import { OutgoingConnections } from './OutgoingConnections';
-import { Stream } from './Stream';
+import { Colors } from '../constants/colors';
 
-export type VisualizeFn = (
-  observe: typeof Rx.pipe,
-  ops: typeof Ops,
-  rx: typeof Rx,
-  rxOps: typeof RxOps,
-) => void;
+const Container = styled.div<{ hidden: boolean }>`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
 
-export interface ValueConnections {
-  visible: boolean;
-  parent: { x: number; y: number };
-  children: Map<string, { x: number; y: number }>;
-}
+  ${props =>
+    props.hidden &&
+    css`
+      display: none;
+    `};
+`;
 
-interface VisualizerProps {
+const VisualizerButton = styled.button`
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  z-index: 1001;
+  width: 64px;
+  height: 64px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: ${Colors.darkBrown};
+  border: 6px solid ${Colors.darkBrown};
+  cursor: pointer;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+`;
+
+interface ScreenProps {
   visualize: VisualizeFn;
-  onNotificationClick: (notification: Notification<any>) => void;
+  onNotificationClick?: (notification: Notification<any>) => void;
 }
 
-interface VisualizerState {
-  streams: Map<string, Map<number, List<Notification<any>>>>;
-  valueConnectionsMap: Map<string, ValueConnections>;
+interface ScreenState {
+  height: number;
+  width: number;
+  visible: boolean;
 }
 
-export class Visualizer extends React.Component<
-  VisualizerProps,
-  VisualizerState
-> {
-  state: VisualizerState = { streams: Map(), valueConnectionsMap: Map() };
+export class Visualizer extends React.Component<ScreenProps, ScreenState> {
+  state = {
+    height: 0,
+    width: 0,
+    visible: false,
+  };
 
-  private unsubscribe$ = new Rx.Subject<void>();
-
-  private receiver = new Rx.Subject<Notification<any>>();
-
-  constructor(props: VisualizerProps) {
+  constructor(props) {
     super(props);
 
-    this.receiver
-      .pipe(RxOps.takeUntil(this.unsubscribe$))
-      .subscribe((notification: Notification<any>) => {
-        this.setState(state => {
-          const streamKey = notification.streamId;
-          const stepsMap = state.streams.get(streamKey) || Map();
-
-          const stepKey = notification.step;
-          const notifications = stepsMap.get(stepKey) || List();
-
-          const newStepsMap = stepsMap.set(
-            stepKey,
-            notifications.push(notification),
-          );
-
-          return {
-            streams: state.streams.set(streamKey, newStepsMap),
-          };
-        });
-      });
-
-    this.handleNotificationReposition = this.handleNotificationReposition.bind(
-      this,
-    );
-    this.handleItemHide = this.handleItemHide.bind(this);
+    this.handleNotificationClick = this.handleNotificationClick.bind(this);
+    this.handleVisibilityClick = this.handleVisibilityClick.bind(this);
   }
 
-  componentDidMount() {
-    const observe = observeCreator(this.receiver);
+  handleVisibilityClick() {
+    if (!this.state.visible) {
+      const rect = document.documentElement.getBoundingClientRect();
 
-    this.props.visualize(observe, Ops, Rx, RxOps);
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
-
-  handleNotificationReposition(
-    notification: Notification<any>,
-    x: number,
-    y: number,
-  ) {
-    if (notification.type !== 'N') {
-      return;
-    }
-
-    this.setState(state => {
-      let updatedMap = state.valueConnectionsMap;
-
-      const currentKey = notification.valueMeta.valueId;
-      const current = state.valueConnectionsMap.get(currentKey);
-      const currentWithNewPosition = {
-        ...(current || { children: Map() }),
-        parent: { x, y },
+      this.setState({
+        height: rect.height,
+        width: rect.width,
         visible: true,
-      };
-
-      updatedMap = updatedMap.set(currentKey, currentWithNewPosition);
-
-      if (notification.valueMeta.previousValueId !== null) {
-        const previousKey = notification.valueMeta.previousValueId;
-        const parent = state.valueConnectionsMap.get(previousKey);
-        const parentWithNewChild = {
-          ...parent,
-          children: parent.children.set(currentKey, { x, y }),
-        };
-
-        updatedMap = updatedMap.set(previousKey, parentWithNewChild);
-      }
-
-      return {
-        valueConnectionsMap: updatedMap,
-      };
-    });
+      });
+    } else {
+      this.setState({
+        visible: false,
+      });
+    }
   }
 
-  handleItemHide(notification: Notification<any>) {
-    if (notification.type !== 'N') {
-      return;
+  handleNotificationClick(notification: Notification<any>) {
+    if (this.props.onNotificationClick) {
+      this.props.onNotificationClick(notification);
     }
-
-    this.setState(state => {
-      const currentKey = notification.valueMeta.valueId;
-      const current = state.valueConnectionsMap.get(currentKey);
-      const currentHidden = {
-        ...(current || { children: Map(), parent: { x: 0, y: 0 } }),
-        visible: false,
-      };
-
-      return {
-        valueConnectionsMap: state.valueConnectionsMap.set(
-          currentKey,
-          currentHidden,
-        ),
-      };
-    });
   }
 
   render() {
     return (
-      <Group>
-        <Group>
-          {this.state.streams.keySeq().map((streamId, i) => (
-            <Stream
-              key={streamId}
-              streamId={streamId}
-              position={i}
-              notificationsBySteps={this.state.streams.get(streamId)}
-              onItemHide={this.handleItemHide}
-              onItemReposition={this.handleNotificationReposition}
-              onItemClick={this.props.onNotificationClick}
-            />
-          ))}
-        </Group>
-        {this.state.valueConnectionsMap
-          .valueSeq()
-          .map((valueConnections, index) => (
-            <OutgoingConnections
-              key={index}
-              startOffsetX={95}
-              startOffsetY={15}
-              endOffsetX={5}
-              endOffsetY={15}
-              valueConnections={valueConnections}
-            />
-          ))}
-      </Group>
+      <div>
+        <Container hidden={!this.state.visible}>
+          <Stage
+            height={this.state.height - 50}
+            offsetY={-50}
+            width={this.state.width - 50}
+            offsetX={-50}
+          >
+            <Layer>
+              <VisualizeManager
+                visualize={this.props.visualize}
+                onNotificationClick={this.handleNotificationClick}
+              />
+            </Layer>
+          </Stage>
+        </Container>
+        <VisualizerButton onClick={this.handleVisibilityClick}>
+          <img src={require('./logo.png')} />
+        </VisualizerButton>
+      </div>
     );
   }
 }

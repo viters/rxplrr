@@ -3,6 +3,7 @@ import { Colors } from '../constants/colors';
 import { isEven } from '../lib/numbers';
 import { LeftyTextRect } from './TextRect';
 import { Notification } from '../observer/interfaces';
+import { rectSizes } from './rectSizes';
 
 interface StreamBarItemProps {
   position: number;
@@ -14,7 +15,7 @@ interface StreamBarItemProps {
 
 export class StreamBarItem extends React.Component<StreamBarItemProps> {
   get yOffset() {
-    return (this.props.position + 1) * 30;
+    return (this.props.position + 1) * rectSizes.height;
   }
 
   get text(): string {

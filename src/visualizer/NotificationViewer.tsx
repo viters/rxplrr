@@ -1,5 +1,6 @@
 import { Notification } from '../observer/interfaces';
 import * as React from 'react';
+import JSONPretty from 'react-json-pretty';
 
 export const NotificationViewer = ({
   notification,
@@ -17,7 +18,8 @@ export const NotificationViewer = ({
       </div>
       {notification.type === 'N' && (
         <div>
-          <strong>Value:</strong> {JSON.stringify(notification.valueMeta.value, null, 2)}
+          <strong>Value:</strong>
+          <JSONPretty data={JSON.stringify(notification.valueMeta.value)}/>
         </div>
       )}
       {notification.type === 'E' && (

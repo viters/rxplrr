@@ -5916,6 +5916,12 @@ react-is@^16.3.1:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.5.2.tgz#e2a7b7c3f5d48062eb769fcb123505eb928722e3"
 
+react-json-pretty@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-json-pretty/-/react-json-pretty-2.0.0.tgz#703bdf7c680afefe3796f4ec00f6424c7865d985"
+  dependencies:
+    prop-types "^15.6.2"
+
 react-konva@^16.5.2:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-16.5.2.tgz#2bfca7b5f236b3c92b503150c49b00a01fd4b2d2"

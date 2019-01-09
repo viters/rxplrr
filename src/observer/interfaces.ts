@@ -6,6 +6,7 @@ export interface ValueMeta<T> {
 
 interface NotificationBase {
   step: number;
+  stepName?: string;
   streamId: string;
   timestamp: number;
 }

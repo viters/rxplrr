@@ -1,7 +1,8 @@
-import { ValueConnections } from './Visualizer';
+import { ValueConnections } from './VisualizeManager';
 import * as React from 'react';
 import { Colors } from '../constants/colors';
 import { Group, Line } from 'react-konva';
+import { rectSizes } from './rectSizes';
 
 interface OutgoingConnectionsProps {
   startOffsetX?: number;
@@ -12,26 +13,26 @@ interface OutgoingConnectionsProps {
 }
 
 export const OutgoingConnections = ({
-  startOffsetX,
-  startOffsetY,
-  endOffsetX,
-  endOffsetY,
   valueConnections,
 }: OutgoingConnectionsProps) => {
   if (!valueConnections.visible) {
     return null;
   }
 
+  const endOffsetX = 10;
+  const startOffsetX = rectSizes.width - endOffsetX;
+  const offsetY = rectSizes.height / 2;
+
   const startPoint = [
-    valueConnections.parent.x + (startOffsetX || 0),
-    valueConnections.parent.y + (startOffsetY || 0),
+    valueConnections.parent.x + startOffsetX,
+    valueConnections.parent.y + offsetY,
   ];
   const children = valueConnections.children
     .valueSeq()
     .map(pos => [
       ...startPoint,
-      pos.x + (endOffsetX || 0),
-      pos.y + (endOffsetY || 0),
+      pos.x + endOffsetX,
+      pos.y + offsetY,
     ]);
 
   return (
