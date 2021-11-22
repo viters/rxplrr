@@ -4,4 +4,4 @@ Visualize your data streams
 
 Project done as a part of an Engineer Diploma Thesis "Data flow visualisation in reactive programming"
 
-My thesis is available here (PL): https://lukaszczesniak.dev/downloads/lukasz-szczesniak-praca-inzynierska.pdf
+Thesis is available here (PL): https://drive.google.com/file/d/1fbyjT8kefr5WVzU8EF054Y3S36PGjgqT/view
